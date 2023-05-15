@@ -84,12 +84,22 @@
             <Button x:Name="btnUpdate" Width="100" Margin="0 0 20 0 " Click="btnUpdate_Click">Update</Button>
           </StackPanel>
           <StackPanel Margin="5" Orientation="Horizontal" HorizontalAlignment="Center">            
-            <Button x:Name="btnDelete" Width="100" Margin="0 0 20 0 ">Delete</Button>
+            <Button x:Name="btnDelete" Width="100" Margin="0 0 20 0 " Click="btnDelete_Click">Delete</Button>
             <Button x:Name="btnLoadData" Width="100" Margin="0 0 20 0 " Click="btnLoadData_Click">Load Data</Button>
           </StackPanel>
         </StackPanel>
-        <DataGrid x:Name="dataGrid" Width="540" Margin="5">
-          
+        <DataGrid x:Name="dataGrid" Width="540" Margin="5" AutoGenerateColumns="True" SelectionChanged="dataGrid_SelectionChanged" >
+          <DataGrid.Columns>            
+            <!--<DataGridTextColumn Header="사번" Binding="{Binding eid}"/>
+            <DataGridTextColumn Header="이름" Binding="{Binding name}"/>
+            <DataGridTextColumn Header="부서" Binding="{Binding department}"/>
+            <DataGridTextColumn Header="직위" Binding="{Binding position}"/>
+            <DataGridTextColumn Header="성별" Binding="{Binding gender}"/>
+            <DataGridTextColumn Header="입사년월" Binding="{Binding date_enter}"/>
+            <DataGridTextColumn Header="퇴사년월" Binding="{Binding date_exit}"/>
+            <DataGridTextColumn Header="연락처" Binding="{Binding contact}"/>
+            <DataGridTextColumn Header="기타" Binding="{Binding comment}"/>-->
+          </DataGrid.Columns>
         </DataGrid>
       </StackPanel>
     </StackPanel>

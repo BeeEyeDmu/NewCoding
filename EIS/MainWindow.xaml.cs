@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MySql.Data.MySqlClient;
+using System;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Data;
-using MySql.Data.MySqlClient;
 
 namespace EIS
 {
@@ -29,12 +18,13 @@ namespace EIS
     string dateExit = "";
 
     string connStr = "server=localhost; user id=root; password=kang32837!; database=eis_db";
-    MySqlConnection conn = null;
+    MySqlConnection conn;
     public MainWindow()
     {
       InitializeComponent();
 
-      
+      conn = new MySqlConnection(connStr);
+      DisplayDataGrid();
     }
 
     private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -51,12 +41,11 @@ namespace EIS
       else
         dateExit = DateTime.MaxValue.ToShortDateString();
 
-      MessageBox.Show(gender + dept + pos + "\n" + dateEnter + "\n" + dateExit);
+      //MessageBox.Show(gender + dept + pos + "\n" + dateEnter + "\n" + dateExit);
 
       conn = new MySqlConnection(connStr);
       conn.Open();
 
-      //string connStr = "server=localhost; user id=root; password=; database=eis_db";
       string sql = string.Format("INSERT INTO eis_table (name, department, position, gender, date_enter, date_exit, contact, comment) "
         + "VALUES ('{0}', '{1}','{2}','{3}','{4}','{5}','{6}','{7}')",
         txtName.Text, dept, pos, gender, dateEnter, dateExit, txtContact.Text, txtComment.Text);
@@ -67,6 +56,7 @@ namespace EIS
 
       conn.Close();
       InitControls();
+      DisplayDataGrid();
     }
 
     private void InitControls()
@@ -102,36 +92,98 @@ namespace EIS
 
     private void btnUpdate_Click(object sender, RoutedEventArgs e)
     {
-      cbDept.SelectedIndex = -1;
-      cbPos.SelectedIndex = -1;
+      conn.Open();
+
+      if (rbMale.IsChecked == true)
+        gender = "남성";
+      else
+        gender = "여성";
+
+      dateEnter = dpEnter.Text;
+      dateExit = dpExit.Text;
+
+      string sql = string.Format("UPDATE eis_table SET name='{0}', department='{1}', position='{2}', gender='{3}', date_enter='{4}', date_exit='{5}', contact='{6}', comment='{7}' WHERE eid={8}",
+        txtName.Text, dept, pos, gender, dateEnter, dateExit, txtContact.Text, txtComment.Text, txtEid.Text);
+
+      MySqlCommand cmd = new MySqlCommand(sql, conn);
+      if (cmd.ExecuteNonQuery() == 1)
+        MessageBox.Show("Updated successfully!");
+
+      conn.Close();
+      InitControls();
+
+      DisplayDataGrid();
     }
 
     private void btnLoadData_Click(object sender, RoutedEventArgs e)
     {
-      conn = new MySqlConnection(connStr);
+      DisplayDataGrid();
+    }
+
+    private void DisplayDataGrid()
+    {
       conn.Open();
 
-      string sql = "SELECT * FROM eis_table";
+      //string sql = "SELECT * FROM eis_table";
+      string sql = "SELECT eid AS '사번', name AS '이름', department AS '부서', position AS '직급', gender AS '성별', date_enter AS '입사일', date_exit AS '퇴사일', contact AS '연락처', comment AS '기타' FROM eis_table";
 
       try
       {
-        //MySqlCommand cmd = new MySqlCommand(sql, conn);
-        //MySqlDataAdapter da = new MySqlDataAdapter();
-        //da.SelectCommand = cmd;
-        //DataTable dt = new DataTable();
-        //da.Fill(dt);
-        //dataGrid.DataContext = dt;
         MySqlDataAdapter da = new MySqlDataAdapter(sql, conn);
         DataSet ds = new DataSet();
         da.Fill(ds);
         dataGrid.ItemsSource = ds.Tables[0].DefaultView;
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         MessageBox.Show(ex.Message);
-      }
+      }      
 
       conn.Close();
+    }
+
+    private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      DataGrid dg = sender as DataGrid;
+      DataRowView rowView = dg.SelectedItem as DataRowView;
+
+      if (rowView == null)
+        return;
+
+      txtEid.Text = rowView.Row[0].ToString();
+      txtName.Text = rowView.Row[1].ToString();
+      cbDept.Text = rowView.Row[2].ToString();
+      cbPos.Text = rowView.Row[3].ToString();
+      if (rowView.Row[4].ToString() == "남성")
+      {
+        rbMale.IsChecked = true;
+        rbFeMale.IsChecked = false;
+      }
+      else
+      {
+        rbMale.IsChecked = false;
+        rbFeMale.IsChecked = true;
+      }
+      dpEnter.Text = rowView.Row[5].ToString();
+      dpExit.Text = rowView.Row[6].ToString();
+      txtContact.Text = rowView.Row[7].ToString();
+      txtComment.Text = rowView.Row[8].ToString();
+    }
+
+    private void btnDelete_Click(object sender, RoutedEventArgs e)
+    {
+      conn.Open();
+
+      string sql = string.Format("DELETE FROM eis_table WHERE eid = {0}", txtEid.Text);
+
+      MySqlCommand cmd = new MySqlCommand(sql, conn);
+      if (cmd.ExecuteNonQuery() == 1)
+        MessageBox.Show("Deleted successfully!");
+
+      conn.Close();
+      InitControls();
+
+      DisplayDataGrid();
     }
   }
 }
