@@ -1,0 +1,13 @@
+﻿<Window x:Class="SnakeBiteWPF.Game"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SnakeBiteWPF"
+        mc:Ignorable="d"
+        Title="SnakeBite" Height="340" Width="420" KeyDown="Window_KeyDown" >
+  <Canvas x:Name="field" Width="420" Height="320" Background="LightBlue">
+    <TextBlock x:Name="txtScore" Margin="10" Canvas.Left="200" Text="Socre = 0"/>
+    <TextBlock x:Name="txtTimer" Margin="10" Canvas.Left="280" Text="Time = 0"/>
+  </Canvas>
+</Window>
